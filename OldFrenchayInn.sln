@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OldFrenchayInn", "OldFrenchayInn\OldFrenchayInn.csproj", "{A73253B1-4968-46D0-AA68-0C3CEFBC50F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OFITests", "UnitTestProject1\OFITests.csproj", "{30F1D76A-B8D3-4A14-981A-6433E0CFAE53}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A73253B1-4968-46D0-AA68-0C3CEFBC50F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A73253B1-4968-46D0-AA68-0C3CEFBC50F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A73253B1-4968-46D0-AA68-0C3CEFBC50F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A73253B1-4968-46D0-AA68-0C3CEFBC50F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F1D76A-B8D3-4A14-981A-6433E0CFAE53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F1D76A-B8D3-4A14-981A-6433E0CFAE53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F1D76A-B8D3-4A14-981A-6433E0CFAE53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F1D76A-B8D3-4A14-981A-6433E0CFAE53}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
