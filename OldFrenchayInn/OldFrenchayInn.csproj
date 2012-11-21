@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Booking.cs" />
     <Compile Include="CardDetails.cs" />
+    <Compile Include="collapseRangesExtension.cs" />
     <Compile Include="RoomFeatures.cs" />
     <Compile Include="RoomTypes.cs" />
     <Compile Include="Customer.cs" />
@@ -55,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
