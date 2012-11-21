@@ -31,7 +31,7 @@ namespace OldFrenchayInn {
                 return Console.ReadLine();
             }
 
-            Out(string.Format("[{0}] ", string.Join(", ", options)), false);
+            Out(string.Format("[{0}] ", string.Join(", ", options.CollapseRanges())), false);
             string answer = Console.ReadLine();
 
             if (options.Contains(answer)){
@@ -83,7 +83,7 @@ namespace OldFrenchayInn {
             try {
                 booking = Booking.Create(new DateTime(2013, 4, chosenStartDate), chosenNumberOfDays, type);
             }
-            catch (OutOfMemoryException) {
+            catch (OutOfRoomException) {
                 Out("Oh! Sorry, we don't have that time free.");
                 return true;
             }
