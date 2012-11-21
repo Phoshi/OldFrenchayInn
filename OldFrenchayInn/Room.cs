@@ -46,6 +46,10 @@ namespace OldFrenchayInn {
             return base.Equals(obj);
         }
 
+        public override int GetHashCode() {
+            return Number.GetHashCode();
+        }
+
         public override string ToString(){
             return string.Format("Number {0} ({1})", Number, Type);
         }

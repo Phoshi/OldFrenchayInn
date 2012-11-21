@@ -53,6 +53,10 @@ namespace OldFrenchayInn {
             return base.Equals(obj);
         }
 
+        public override int GetHashCode(){
+            return Name.GetHashCode();
+        }
+
         public override string ToString(){
             string features =
                 "\t" + string.Join("\n\t",
