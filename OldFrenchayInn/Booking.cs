@@ -29,7 +29,7 @@ namespace OldFrenchayInn {
                     return preliminaryBooking;
                 }
             }
-            throw new OutOfMemoryException("No more rooms!");
+            throw new OutOfRoomException("No more rooms!");
         }
 
         public DateTime StartDate { get; internal set; }
@@ -64,8 +64,13 @@ namespace OldFrenchayInn {
         }
 
         public override string ToString(){
-            return string.Format("Room {0} for {1} from {2} to {3}", Room, Customer, StartDate.ToShortDateString(),
+            return string.Format("Room {0} for {1} from {2} to {3}", Room.Number, Customer, StartDate.ToShortDateString(),
                                  EndDate.ToShortDateString());
         }
+    }
+
+    [Serializable]
+    public class OutOfRoomException : Exception{
+        public OutOfRoomException(string message) : base(message){}
     }
 }
