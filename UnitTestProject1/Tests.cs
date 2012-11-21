@@ -30,7 +30,7 @@ namespace OFITests {
             DateTime end = new DateTime(2012, 4, 5);
             Booking booking = new Booking(start, end, customer, room);
 
-            Assert.AreEqual(string.Format("Room {0} for {1} from {2} to {3}", room, customer, start.ToShortDateString(),
+            Assert.AreEqual(string.Format("Room {0} for {1} from {2} to {3}", room.Number, customer, start.ToShortDateString(),
                                  end.ToShortDateString()), booking.ToString());
 
         }
@@ -97,6 +97,14 @@ namespace OFITests {
             Assert.IsFalse(booking1.Contains(bookingDifferentRoom));
             Assert.IsFalse(booking1.Contains(bookingDifferentRoomNoConflict));
 
+        }
+
+        [TestMethod]
+        public void TestListCollapsing(){
+            var testList = new List<string>{"1", "2", "3", "5", "7", "8", "9", "12", "15", "16", "17"};
+            var newList = new List<string>(testList.CollapseRanges());
+            var result = string.Join(", ", newList);
+            Assert.AreEqual("1-3, 5, 7-9, 12, 15-17", result);
         }
     }
 }
