@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace OldFrenchayInn {
-    public static class CollapseRangesExtension {
+    public static class Extensions {
         /// <summary>
         /// Takes a list of stringy integers and collapses any ranges found within
         /// Example: [1, 2, 3, 5, 8, 9, 10] => [1-3, 5, 8-10]
@@ -11,11 +11,7 @@ namespace OldFrenchayInn {
         /// <param name="self">The list to collapse</param>
         /// <returns>A collapsed list</returns>
         public static IEnumerable<string> CollapseRanges(this IEnumerable<string> self){
-            Func<string, bool> isNumeric = (element =>{
-                                                int num;
-                                                return int.TryParse(element, out num);
-                                            });
-            if (!self.All(isNumeric)){
+            if (!self.All(IsNumericValidator.IsNumeric)){
                 return self;
             }
 
@@ -37,6 +33,15 @@ namespace OldFrenchayInn {
 
             returnList.Reverse();
             return returnList;
-        } 
+        }
+
+        /// <summary>
+        /// Returns an enumerable where every element of the enumerable is lowercase.
+        /// </summary>
+        /// <param name="self">The enumerable</param>
+        /// <returns>A lowercase variant of the enumerable</returns>
+        public static IEnumerable<string> ToLower(this IEnumerable<string> self){
+            return from element in self select element.ToLower();
+        }  
     }
 }
