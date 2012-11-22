@@ -43,7 +43,8 @@
   <ItemGroup>
     <Compile Include="Booking.cs" />
     <Compile Include="CardDetails.cs" />
-    <Compile Include="collapseRangesExtension.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IsNumericValidator.cs" />
     <Compile Include="RoomFeatures.cs" />
     <Compile Include="RoomTypes.cs" />
     <Compile Include="Customer.cs" />
