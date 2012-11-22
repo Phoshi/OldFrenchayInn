@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OldFrenchayInn {
     /// <summary>
     /// Text User Interface class
     /// </summary>
     class TUInterface{
+        /// <summary>
+        /// How many days the month of april contains
+        /// </summary>
         private const int DAYS_IN_APRIL = 30;
-        private static void Out(object output, bool newLine = true){
-            if (newLine){
+
+        /// <summary>
+        /// Outputs a message to the user, with or without a terminator.
+        /// Terminator is newline on this system.
+        /// </summary>
+        /// <param name="output">Message to show the user</param>
+        /// <param name="terminate">Whether to terminate message or allow subsequent messages to continue this one</param>
+        private static void Out(object output, bool terminate = true){
+            if (terminate){
                 Console.WriteLine(output);
             }
             else{
@@ -20,21 +29,42 @@ namespace OldFrenchayInn {
             }
         }
 
+        /// <summary>
+        /// Asks a yes|no question of the user, returns whether they said yes.
+        /// </summary>
+        /// <param name="question">The question to be asked</param>
+        /// <returns>The user's response</returns>
         private static bool Ask(string question){
-            Out(question + " [y, n] ", false);
-            string read = Console.ReadLine();
-            return read.StartsWith("y");
+            Out(question, false);
+            var result = In(new[]{"y", "n"},
+                            validationFunction:
+                                (iter, item) => iter.Contains(item.First().ToString(CultureInfo.InvariantCulture)));
+            return result.StartsWith("y");
         }
 
-        private static string In(IEnumerable<string> options = null){
-            if (options == null){
+        /// <summary>
+        /// Takes in input from the user, optionally offering them only a selection of options.
+        /// Will collapse ranges of numbers in all-numeric option sets. e.g. [1, 2, 3, 5] => [1-3, 5]
+        /// Will continue to ask for new input until the validation is fulfilled.
+        /// </summary>
+        /// <param name="options">Possible options the user can select. If all numeric, range collapsing will occur.</param>
+        /// <param name="validationFunction">An optional function to validate with. Must be of the signature (IEnumerable<string>, string) : bool. Will be IEnumerable.Contains by default.</string></param>
+        /// <returns>The user's valid inputted string.</returns>
+        private static string In(IEnumerable<string> options = null, Func<IEnumerable<string>, string, bool> validationFunction = null){
+            if (options == null && validationFunction==null){
                 return Console.ReadLine();
             }
 
-            Out(string.Format("[{0}] ", string.Join(", ", options.CollapseRanges())), false);
+            if (validationFunction==null){
+                validationFunction = (iterable, current) => iterable.Contains(current);
+            }
+
+            if (options != null){
+                Out(string.Format("[{0}] ", string.Join(", ", options.CollapseRanges())), false);
+            }
             string answer = Console.ReadLine();
 
-            if (options.Contains(answer)){
+            if (validationFunction(options, answer)){
                 return answer;
             }
 
@@ -47,46 +77,39 @@ namespace OldFrenchayInn {
         /// </summary>
         /// <returns>True for continue looping, false otherwise.</returns>
         public bool Loop(){
+            //Begin
+
             Out("Welcome to Old Frenchay Inn!");
-            bool seeRooms = Ask("Would you like to see our rooms?");
+            var seeRooms = Ask("Would you like to see our rooms?");
             if (!seeRooms){
                 Out("Okay then.");
                 return true;
             }
 
-            foreach (RoomTypes roomType in new[]{RoomTypes.Single, RoomTypes.Double, RoomTypes.Family}){
-                Out(RoomType.Get(roomType));
-            }
+            PrintRoomTypeList();
+
+            //Selecting room type
 
             Out("Which room type would you like to book?");
-            string chosenType = In(new[]{"Single", "Double", "Family"});
-            RoomTypes types;
-            bool success = RoomTypes.TryParse(chosenType, out types);
-            if (!success){
-                Out("General Failure.");
-                return true;
-            }
-            RoomType type = RoomType.Get(types);
+            var type = GetRoomTypeFromUser();
+
+            //Selecting date
 
             Out("Sweet. When from? We only have april.");
-            int chosenStartDate = int.Parse(
-                In(from number in Enumerable.Range(1, DAYS_IN_APRIL) select number.ToString())
-                );
+            var chosenStartDate = GetStartDateFromUser();
 
 
             Out("Okay. How long for? You can't leave april. Sorry.");
-            int chosenNumberOfDays = int.Parse(
-                In(from number in Enumerable.Range(1, DAYS_IN_APRIL - chosenStartDate) select number.ToString())
-                );
+            var chosenNumberOfDays = GetNumberOfDaysFromUser(chosenStartDate);
 
-            Booking booking;
-            try {
-                booking = Booking.Create(new DateTime(2013, 4, chosenStartDate), chosenNumberOfDays, type);
-            }
-            catch (OutOfRoomException) {
+            var booking = MakeBooking(chosenStartDate, chosenNumberOfDays, type);
+            if (booking == null){
                 Out("Oh! Sorry, we don't have that time free.");
                 return true;
             }
+
+            //Accepting price
+
             double price = booking.GetPrice();
             Out(string.Format("Okay, that'll be £{0}.", price));
 
@@ -95,18 +118,25 @@ namespace OldFrenchayInn {
                 return true;
             }
 
+            //Taking name
+
             Out("Sweet. I'm just gonna need your name: ", false);
             string name = In();
             Out("Your email address: ", false);
             string email = In();
+
+            //Finishing booking
 
             Out("Thanks. Gimme a sec to make your booking", false);
             DoLongWork();
 
             Booking.AddBooking(booking);
             Out(string.Format("Okay, your booking number is {0}.", booking.ReservationNumber));
+
+            //Taking card details
+
             Out("Let's just finalise this and we're all done, okay? Card number: ", false);
-            string cardNumber = In();
+            var cardNumber = GetCardNumber();
             Out("And that was issued on:", false);
             string issueDate = In();
             Out("And expires on:", false);
@@ -114,8 +144,8 @@ namespace OldFrenchayInn {
             Out("Gotcha. Let's just finalise this", false);
             DoLongWork();
 
-            CardDetails details = new CardDetails(cardNumber, issueDate, expiryDate);
-            Customer customer = new Customer(name, email, details);
+            var details = new CardDetails(cardNumber, issueDate, expiryDate);
+            var customer = new Customer(name, email, details);
 
             booking.Customer = customer;
 
@@ -124,8 +154,58 @@ namespace OldFrenchayInn {
             return true;
         }
 
-        private void DoLongWork(){
-            for (int i = 0; i < 3; i++) {
+        private static string GetCardNumber(){
+            string cardNumber = In(validationFunction: (iter, item) => IsNumericValidator.IsNumeric(item));
+            return cardNumber;
+        }
+
+        private static Booking MakeBooking(int chosenStartDate, int chosenNumberOfDays, RoomType type){
+            Booking booking;
+            try{
+                booking = Booking.Create(new DateTime(2013, 4, chosenStartDate), chosenNumberOfDays, type);
+            }
+            catch (OutOfRoomException){
+                return null;
+            }
+            return booking;
+        }
+
+        private static int GetNumberOfDaysFromUser(int chosenStartDate){
+            int chosenNumberOfDays = int.Parse(
+                In(from number in Enumerable.Range(1, DAYS_IN_APRIL - chosenStartDate)
+                   select number.ToString(CultureInfo.InvariantCulture))
+                );
+            return chosenNumberOfDays;
+        }
+
+        private static int GetStartDateFromUser(){
+            int chosenStartDate = int.Parse(
+                In(from number in Enumerable.Range(1, DAYS_IN_APRIL) select number.ToString(CultureInfo.InvariantCulture))
+                );
+            return chosenStartDate;
+        }
+
+        private static RoomType GetRoomTypeFromUser(){
+            var chosenType = In(new[]{"Single", "Double", "Family"},
+                                validationFunction: (iter, item) => iter.ToLower().Contains(item.ToLower()));
+            RoomTypes types;
+            bool success = RoomTypes.TryParse(chosenType, ignoreCase: true, result: out types);
+            if (!success){
+                Out("General Failure.");
+                return null;
+            }
+            RoomType type = RoomType.Get(types);
+            return type;
+        }
+
+        private static void PrintRoomTypeList(){
+            foreach (RoomTypes roomType in new[]{RoomTypes.Single, RoomTypes.Double, RoomTypes.Family}){
+                Out(RoomType.Get(roomType));
+            }
+        }
+
+        private static void DoLongWork(){
+            for (var i = 0; i < 3; i++) {
                 Thread.Sleep(1000);
                 Out(".", false);
             }
